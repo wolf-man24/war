@@ -1,34 +1,35 @@
 
-name: NodeJS Syntax Check
+name: Auto Check JavaScript
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [20.x, 22.x]
-
     steps:
-      - name: Checkout repository
+      - name: Get latest code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
 
-      - name: Check JavaScript files
+      - name: Check updated JavaScript files
         run: |
+          count=0
           for file in *.js; do
             [ -f "$file" ] || continue
+            count=$((count + 1))
             echo "Checking $file"
             node --check "$file"
           done
+          echo "Checked $count JavaScript files."
